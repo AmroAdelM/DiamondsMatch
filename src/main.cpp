@@ -4,6 +4,8 @@
 #include <king/Updater.h>
 #include <random>
 #include <iostream>
+
+#define BOARD_SIZE 8
 //**********************************************************************
 struct matchItem
 {
@@ -24,7 +26,7 @@ public:
 		, firstRow(-1)
 		, secondCol(-1)
 		, secondRow(-1)
-		, mDiamonds(8, std::vector<int>(8)) {
+		, mDiamonds(BOARD_SIZE, std::vector<int>(BOARD_SIZE)) {
 	}
 	void generateInitialDiamonds()
 	{
@@ -33,9 +35,9 @@ public:
 		std::mt19937 rng(dev());
 		std::uniform_int_distribution<std::mt19937::result_type> dist6(1, 5); // distribution in range [1, 5]
 
-		for (auto row = 0; row < 8; row++)
+		for (auto row = 0; row < BOARD_SIZE; row++)
 		{
-			for (auto col = 0; col < 8; col++)
+			for (auto col = 0; col < BOARD_SIZE; col++)
 			{
 				auto newDmnd = dist6(rng);
 				mDiamonds[row][col] = newDmnd;
@@ -68,7 +70,7 @@ public:
 
 	bool isValid(int x)
 	{
-		return (x >= 0 && x < 8);
+		return (x >= 0 && x < BOARD_SIZE);
 	}
 	void Start() {
 		generateInitialDiamonds();
@@ -124,9 +126,9 @@ public:
 	{
 		std::vector<matchItem> matches;
 		// traverse the board rows to find horizontal color sequences
-		for (int y = 0; y < 8; ++y)
+		for (int y = 0; y < BOARD_SIZE; ++y)
 		{
-			for (int x = 0; x < 8; ++x)
+			for (int x = 0; x < BOARD_SIZE; ++x)
 			{
 				//int position = y * m_Columns + x;
 				int color = mDiamonds[y][x];
@@ -142,7 +144,7 @@ public:
 					{
 						int searchPosition = x + sequenceCountX;
 						// get color of search position
-						if (searchPosition < 8)
+						if (searchPosition < BOARD_SIZE)
 						{
 							matchingColor = mDiamonds[y][searchPosition];
 						}
@@ -168,7 +170,7 @@ public:
 					{
 						int searchPosition = y + sequenceCountY;
 						// get color of search position
-						if (searchPosition < 8)
+						if (searchPosition < BOARD_SIZE)
 						{
 							matchingColor = mDiamonds[searchPosition][x];
 						}
@@ -256,9 +258,9 @@ public:
 			}
 		}
 
-		for (auto col = 0; col < 8; col++)
+		for (auto col = 0; col < BOARD_SIZE; col++)
 		{
-			for (auto row = 0; row < 8; row++)
+			for (auto row = 0; row < BOARD_SIZE; row++)
 			{
 				auto diamond = mDiamonds[col][row];
 				if (diamond > 0 && diamond < 7)
