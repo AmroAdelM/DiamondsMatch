@@ -2,18 +2,10 @@
 
 #include <king/Engine.h>
 #include <king/Updater.h>
-#include <random>
 #include <iostream>
 #include "../msvc/Utils.h"
 
 //**********************************************************************
-struct matchItem
-{
-	int x;
-	int y;
-	int sequence;
-	bool isX;
-};
 
 class ExampleGame : public King::Updater {
 public:
@@ -25,51 +17,11 @@ public:
 		, firstCol(-1)
 		, firstRow(-1)
 		, secondCol(-1)
-		, secondRow(-1)
-		, mDiamonds(BOARD_SIZE, std::vector<int>(BOARD_SIZE)) {
-	}
-	void generateInitialDiamonds()
-	{
-		std::vector<std::vector<int>> result;
-		std::random_device dev;
-		std::mt19937 rng(dev());
-		std::uniform_int_distribution<std::mt19937::result_type> dist6(1, 5); // distribution in range [1, 5]
-
-		for (auto row = 0; row < BOARD_SIZE; row++)
-		{
-			for (auto col = 0; col < BOARD_SIZE; col++)
-			{
-				auto newDmnd = dist6(rng);
-				mDiamonds[row][col] = newDmnd;
-				if (col > 1)
-				{
-					if (newDmnd == mDiamonds[row][col - 1] && newDmnd == mDiamonds[row][col - 2])
-					{
-						while (newDmnd == mDiamonds[row][col])
-						{
-							newDmnd = dist6(rng);
-						}
-						mDiamonds[row][col] = newDmnd;
-					}
-				}
-
-				if (row > 1)
-				{
-					if (newDmnd == mDiamonds[row - 1][col] && newDmnd == mDiamonds[row - 2][col])
-					{
-						while (newDmnd == mDiamonds[row][col])
-						{
-							newDmnd = dist6(rng);
-						}
-						mDiamonds[row][col] = newDmnd;
-					}
-				}
-			}
-		}
+		, secondRow(-1) {
 	}
 
 	void Start() {
-		generateInitialDiamonds();
+		mDiamonds = generateInitialDiamonds();
 		mEngine.Start(*this);
 	}
 
@@ -245,6 +197,7 @@ public:
 						secondClick = mDiamonds[secondCol][secondRow];
 						mDiamonds[secondCol][secondRow] = firstClick;
 						mDiamonds[firstCol][firstRow] = secondClick;
+						swapMatches(getMatchedDiamonds());
 						swapMatches(getMatchedDiamonds());
 					}
 					firstClick = 0;
