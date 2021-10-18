@@ -102,7 +102,6 @@ public:
 							iterator--;
 						}
 					}
-					//mDiamonds[matchedItem.y][matchedItem.x + position] = 0;
 				}
 				else
 				{
@@ -116,16 +115,14 @@ public:
 					{
 						mDiamonds[matchedItem.y + position - 1][matchedItem.x] = newDmnd;
 					}
-					//mDiamonds[matchedItem.y + position][matchedItem.x] = 0;
 				}
-				//mDiamonds[matchedItem.y + (matchedItem.isX ? 0 : position)][matchedItem.x + (matchedItem.isX ? position : 0)] = 0;
 			}
 		}
 	}
 
 	std::vector<matchItem> getMatchedDiamonds()
 	{
-		std::vector<matchItem> result;
+		std::vector<matchItem> matches;
 		// traverse the board rows to find horizontal color sequences
 		for (int y = 0; y < 8; ++y)
 		{
@@ -199,13 +196,7 @@ public:
 					item.y = y;
 					item.sequence = sequenceCountX;
 					item.isX = true;
-					result.push_back(item);
-					//x += (sequenceCountX - 1);
-					//for (int xPosition = x; (xPosition < sequenceCountX + x) && isValid(xPosition); ++xPosition)
-					//{
-					//	//int xPosition = x + sequence;
-					//	mDiamonds[y][xPosition] = 0;
-					//}
+					matches.push_back(item);
 				}
 				// check if a sequence of at least 3 vertical matching color has been found
 				if (sequenceCountY >= 3)
@@ -215,17 +206,11 @@ public:
 					item.y = y;
 					item.sequence = sequenceCountY;
 					item.isX = false;
-					result.push_back(item);
-					//y += (sequenceCountY - 1);
-					//for (int yPosition = y; (yPosition < sequenceCountY + y) && isValid(yPosition); ++yPosition)
-					//{
-					//	int yPosition = y + sequence;
-					//	mDiamonds[yPosition][x] = 0;
-					//}
+					matches.push_back(item);
 				}
 			}
 		}
-		return result;
+		return matches;
 	}
 
 	void Update() {
