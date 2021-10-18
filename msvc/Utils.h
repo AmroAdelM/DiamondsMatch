@@ -4,6 +4,8 @@
 #include<vector>
 
 #define BOARD_SIZE 8
+#define NO_MATCHES 3
+#define MAX_MATCHES 5
 
 struct matchItem
 {

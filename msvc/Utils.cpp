@@ -11,13 +11,13 @@ std::vector<std::vector<int>> generateInitialDiamonds()
 
 	std::random_device dev;
 	std::mt19937 rng(dev());
-	std::uniform_int_distribution<std::mt19937::result_type> dist6(1, 5); // distribution in range [1, 5]
+	std::uniform_int_distribution<std::mt19937::result_type> randomGenerator(1, 5); // distribution in range [1, 5]
 
 	for (auto row = 0; row < BOARD_SIZE; row++)
 	{
 		for (auto col = 0; col < BOARD_SIZE; col++)
 		{
-			auto newDmnd = dist6(rng);
+			auto newDmnd = randomGenerator(rng);
 			mDiamonds[row][col] = newDmnd;
 
 			//check column matches before adding the new random diamond
@@ -27,7 +27,7 @@ std::vector<std::vector<int>> generateInitialDiamonds()
 				{
 					while (newDmnd == mDiamonds[row][col])
 					{
-						newDmnd = dist6(rng);
+						newDmnd = randomGenerator(rng);
 					}
 				}
 			}
@@ -39,7 +39,7 @@ std::vector<std::vector<int>> generateInitialDiamonds()
 				{
 					while (newDmnd == mDiamonds[row][col])
 					{
-						newDmnd = dist6(rng);
+						newDmnd = randomGenerator(rng);
 					}
 				}
 			}

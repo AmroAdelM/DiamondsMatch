@@ -29,13 +29,13 @@ public:
 	{
 		std::random_device dev;
 		std::mt19937 rng(dev());
-		std::uniform_int_distribution<std::mt19937::result_type> dist6(1, 5);
+		std::uniform_int_distribution<std::mt19937::result_type> randomGenerator(1, 5); //King::Engine::Texture
 		for (const auto& matchedItem : items)
 		{
 			for (int position = matchedItem.sequence; (position > 0) && isValid(position + (matchedItem.isX ? matchedItem.x : matchedItem.y)); position--)
 			{
 				auto sequence = matchedItem.sequence;
-				auto newDmnd = dist6(rng);
+				auto newDmnd = randomGenerator(rng);
 				if (matchedItem.isX)
 				{
 					auto iterator = matchedItem.y;
@@ -73,24 +73,21 @@ public:
 	std::vector<matchItem> getMatchedDiamonds()
 	{
 		std::vector<matchItem> matches;
-		// traverse the board rows to find horizontal color sequences
 		for (int y = 0; y < BOARD_SIZE; ++y)
 		{
 			for (int x = 0; x < BOARD_SIZE; ++x)
 			{
-				//int position = y * m_Columns + x;
-				int color = mDiamonds[y][x];
-				// look in this row for a sequence
-				int sequenceCountX = 1;
-				int sequenceCountY = 1;
+				int currentColor = mDiamonds[y][x];
+				int colMatchCount = 1;
+				int rowMatchCount = 1;
 
 				// look horizontally - there is no need to look up the last two columns
 				if (x < 6)
 				{
-					int matchingColor = color;
-					while (sequenceCountX > 0 && sequenceCountX < 5)
+					int matchingColor = currentColor;
+					while (colMatchCount > 0 && colMatchCount < MAX_MATCHES)
 					{
-						int searchPosition = x + sequenceCountX;
+						int searchPosition = x + colMatchCount;
 						// get color of search position
 						if (searchPosition < BOARD_SIZE)
 						{
@@ -98,13 +95,13 @@ public:
 						}
 
 						// stop looking if the colors don't match
-						if (matchingColor != color)
+						if (currentColor != matchingColor)
 						{
 							break;
 						}
 						else
 						{
-							++sequenceCountX;
+							++colMatchCount;
 						}
 					}
 				}
@@ -112,11 +109,11 @@ public:
 				// look vertically - there is no need to look up the last two rows
 				if (y < 6)
 				{
-					int matchingColor = color;
+					int matchingColor = currentColor;
 
-					while (sequenceCountY > 0 && sequenceCountY < 5)
+					while (rowMatchCount > 0 && rowMatchCount < MAX_MATCHES)
 					{
-						int searchPosition = y + sequenceCountY;
+						int searchPosition = y + rowMatchCount;
 						// get color of search position
 						if (searchPosition < BOARD_SIZE)
 						{
@@ -127,34 +124,34 @@ public:
 							break;
 						}
 						// stop looking if the colors don't match
-						if (matchingColor != color)
+						if (currentColor != matchingColor)
 						{
 							break;
 						}
 						else
 						{
-							++sequenceCountY;
+							++rowMatchCount;
 						}
 					}
 				}
 
 				// check if a sequence of at least 3 horizontal matching color has been found
-				if (sequenceCountX >= 3)
+				if (colMatchCount >= NO_MATCHES)
 				{
 					matchItem item;
 					item.x = x;
 					item.y = y;
-					item.sequence = sequenceCountX;
+					item.sequence = colMatchCount;
 					item.isX = true;
 					matches.push_back(item);
 				}
 				// check if a sequence of at least 3 vertical matching color has been found
-				if (sequenceCountY >= 3)
+				if (rowMatchCount >= NO_MATCHES)
 				{
 					matchItem item;
 					item.x = x;
 					item.y = y;
-					item.sequence = sequenceCountY;
+					item.sequence = rowMatchCount;
 					item.isX = false;
 					matches.push_back(item);
 				}
@@ -197,7 +194,6 @@ public:
 						secondClick = mDiamonds[secondCol][secondRow];
 						mDiamonds[secondCol][secondRow] = firstClick;
 						mDiamonds[firstCol][firstRow] = secondClick;
-						swapMatches(getMatchedDiamonds());
 						swapMatches(getMatchedDiamonds());
 					}
 					firstClick = 0;
