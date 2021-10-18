@@ -42,6 +42,12 @@
     <ClCompile Include="..\external\include\king\SdlSurface.cpp">
       <Filter>Source Files\kinglib</Filter>
     </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Board,cpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\external\include\king\Engine.h">
@@ -64,6 +70,9 @@
     </ClInclude>
     <ClInclude Include="..\external\include\king\Updater.h">
       <Filter>Header Files\kinglib</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

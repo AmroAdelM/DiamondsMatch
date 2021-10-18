@@ -4,8 +4,8 @@
 #include <king/Updater.h>
 #include <random>
 #include <iostream>
+#include "../msvc/Utils.h"
 
-#define BOARD_SIZE 8
 //**********************************************************************
 struct matchItem
 {
@@ -68,10 +68,6 @@ public:
 		}
 	}
 
-	bool isValid(int x)
-	{
-		return (x >= 0 && x < BOARD_SIZE);
-	}
 	void Start() {
 		generateInitialDiamonds();
 		mEngine.Start(*this);
