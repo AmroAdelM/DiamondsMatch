@@ -45,7 +45,7 @@
     <ClCompile Include="..\src\Board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utils.cpp">
+    <ClCompile Include="..\src\BoardUpdater.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,10 +71,10 @@
     <ClInclude Include="..\external\include\king\Updater.h">
       <Filter>Header Files\kinglib</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Utils.h">
+    <ClInclude Include="..\include\Board.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Board.h">
+    <ClInclude Include="..\include\BoardUpdater.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

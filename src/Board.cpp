@@ -1,5 +1,5 @@
 #include "Board.h"
-#include "Utils.h"
+#include "BoardUpdater.h"
 
 Board::Board(int aBoard_size, int aMatch, int aMax)
 	: mBoardSize(aBoard_size), mNo_Matches(aMatch), mMax_Matches(aMax), mDiamonds(mBoardSize, std::vector<int>(mBoardSize)){}
