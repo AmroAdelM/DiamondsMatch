@@ -2,7 +2,10 @@
 #include "BoardUpdater.h"
 
 Board::Board(int aBoard_size, int aMatch, int aMax)
-	: mBoardSize(aBoard_size), mNo_Matches(aMatch), mMax_Matches(aMax), mDiamonds(mBoardSize, std::vector<int>(mBoardSize)){}
+	: mBoardSize(aBoard_size), mNo_Matches(aMatch), mMax_Matches(aMax)
+{
+	mDiamonds = std::vector<std::vector<int>>(mBoardSize, std::vector<int>(mBoardSize, 0));
+}
 
 int Board::getDiamond(int x, int y)
 {
