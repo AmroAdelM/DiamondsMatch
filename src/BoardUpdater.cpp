@@ -8,12 +8,12 @@ bool isKeyValid(int x)
 BoardUpdater::BoardUpdater()
 	: mEngine("./assets")
 	, mBoard(BOARD_SIZE, NO_MATCHES, MAX_MATCHES)
-	, firstClick(0)
-	, secondClick(0)
-	, firstCol(-1)
-	, firstRow(-1)
-	, secondCol(-1)
-	, secondRow(-1){}
+	, firstClickValue(0)
+	, secondClickValue(0)
+	, firstClickCol(-1)
+	, firstClickRow(-1)
+	, secondClickCol(-1)
+	, secondClickRow(-1) {}
 
 void BoardUpdater::Update() {
 	mEngine.Render(King::Engine::TEXTURE_BACKGROUND, 0, 0);
@@ -36,30 +36,30 @@ void BoardUpdater::handleMouseClick()
 
 	if (isKeyValid(col) && isKeyValid(row))
 	{
-		if (firstClick == 0 && firstCol == -1 && firstRow == -1 && (row != secondRow || col != secondCol))
+		if (firstClickValue == 0 && firstClickCol == -1 && firstClickRow == -1 && (row != secondClickRow || col != secondClickCol))
 		{
-			firstCol = col;
-			firstRow = row;
+			firstClickCol = col;
+			firstClickRow = row;
 
-			firstClick = mBoard.getDiamond(firstCol, firstRow);
-			secondClick = 0;
-			secondCol = -1;
-			secondRow = -1;
+			firstClickValue = mBoard.getDiamond(firstClickCol, firstClickRow);
+			secondClickValue = 0;
+			secondClickCol = -1;
+			secondClickRow = -1;
 		}
-		else if (secondClick == 0 && secondCol == -1 && secondRow == -1 && (row != firstRow || col != firstCol))
+		else if (secondClickValue == 0 && secondClickCol == -1 && secondClickRow == -1 && (row != firstClickRow || col != firstClickCol))
 		{
-			secondCol = col;
-			secondRow = row;
-			if ((abs(secondCol - firstCol) + abs(secondRow - firstRow)) == 1)
+			secondClickCol = col;
+			secondClickRow = row;
+			if ((abs(secondClickCol - firstClickCol) + abs(secondClickRow - firstClickRow)) == 1)
 			{
-				secondClick = mBoard.getDiamond(secondCol, secondRow);
-				mBoard.setDiamond(secondCol, secondRow, firstClick);
-				mBoard.setDiamond(firstCol, firstRow, secondClick);
+				secondClickValue = mBoard.getDiamond(secondClickCol, secondClickRow);
+				mBoard.setDiamond(secondClickCol, secondClickRow, firstClickValue);
+				mBoard.setDiamond(firstClickCol, firstClickRow, secondClickValue);
 				mBoard.swapMatches(mBoard.getMatchedDiamonds());
 			}
-			firstClick = 0;
-			firstRow = -1;
-			firstCol = -1;
+			firstClickValue = 0;
+			firstClickRow = -1;
+			firstClickCol = -1;
 		}
 	}
 }

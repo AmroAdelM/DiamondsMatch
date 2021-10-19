@@ -23,10 +23,10 @@ private:
 	King::Engine mEngine;
 	Board mBoard;
 
-	int firstCol;
-	int firstRow;
-	int secondCol;
-	int secondRow;
-	int firstClick;
-	int secondClick;
+	int firstClickCol;
+	int firstClickRow;
+	int secondClickCol;
+	int secondClickRow;
+	int firstClickValue;
+	int secondClickValue;
 };
