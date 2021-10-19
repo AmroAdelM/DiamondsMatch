@@ -3,7 +3,7 @@
 #include <king/Engine.h>
 #include <king/Updater.h>
 #include <iostream>
-#include "../msvc/Utils.h"
+#include "../include/Utils.h"
 
 //**********************************************************************
 
