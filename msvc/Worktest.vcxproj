@@ -92,6 +92,7 @@
     <ClInclude Include="..\external\include\king\SdlSurface.h" />
     <ClInclude Include="..\external\include\king\SdlWindow.h" />
     <ClInclude Include="..\external\include\king\Updater.h" />
+    <ClInclude Include="..\include\Board.h" />
     <ClInclude Include="..\include\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

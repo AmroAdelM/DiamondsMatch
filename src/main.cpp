@@ -4,6 +4,7 @@
 #include <king/Updater.h>
 #include <iostream>
 #include "../include/Utils.h"
+#include"../include/Board.h"
 
 //**********************************************************************
 
@@ -25,141 +26,6 @@ public:
 		mEngine.Start(*this);
 	}
 
-	void swapMatches(std::vector<matchItem> items)
-	{
-		std::random_device dev;
-		std::mt19937 rng(dev());
-		std::uniform_int_distribution<std::mt19937::result_type> randomGenerator(1, 5); //King::Engine::Texture
-		for (const auto& matchedItem : items)
-		{
-			for (int position = matchedItem.sequence; (position > 0) && isValid(position + (matchedItem.isX ? matchedItem.x : matchedItem.y)); position--)
-			{
-				auto sequence = matchedItem.sequence;
-				auto newDmnd = randomGenerator(rng);
-				if (matchedItem.isX)
-				{
-					auto iterator = matchedItem.y;
-					while (iterator >= 0)
-					{
-						if (iterator > 0)
-						{
-							mDiamonds[iterator][matchedItem.x + position - 1] = mDiamonds[iterator - 1][matchedItem.x + position - 1];
-							iterator--;
-						}
-						else
-						{
-							mDiamonds[iterator][matchedItem.x + position - 1] = newDmnd;
-							iterator--;
-						}
-					}
-				}
-				else
-				{
-					auto iterator = matchedItem.y + position - sequence - 1;
-					if (iterator >= 0)
-					{
-						mDiamonds[matchedItem.y + position - 1][matchedItem.x] = mDiamonds[iterator][matchedItem.x];
-						mDiamonds[iterator--][matchedItem.x] = newDmnd;
-					}
-					else
-					{
-						mDiamonds[matchedItem.y + position - 1][matchedItem.x] = newDmnd;
-					}
-				}
-			}
-		}
-	}
-
-	std::vector<matchItem> getMatchedDiamonds()
-	{
-		std::vector<matchItem> matches;
-		for (int y = 0; y < BOARD_SIZE; ++y)
-		{
-			for (int x = 0; x < BOARD_SIZE; ++x)
-			{
-				int currentColor = mDiamonds[y][x];
-				int colMatchCount = 1;
-				int rowMatchCount = 1;
-
-				// look horizontally - there is no need to look up the last two columns
-				if (x < 6)
-				{
-					int matchingColor = currentColor;
-					while (colMatchCount > 0 && colMatchCount < MAX_MATCHES)
-					{
-						int searchPosition = x + colMatchCount;
-						// get color of search position
-						if (searchPosition < BOARD_SIZE)
-						{
-							matchingColor = mDiamonds[y][searchPosition];
-						}
-
-						// stop looking if the colors don't match
-						if (currentColor != matchingColor)
-						{
-							break;
-						}
-						else
-						{
-							++colMatchCount;
-						}
-					}
-				}
-
-				// look vertically - there is no need to look up the last two rows
-				if (y < 6)
-				{
-					int matchingColor = currentColor;
-
-					while (rowMatchCount > 0 && rowMatchCount < MAX_MATCHES)
-					{
-						int searchPosition = y + rowMatchCount;
-						// get color of search position
-						if (searchPosition < BOARD_SIZE)
-						{
-							matchingColor = mDiamonds[searchPosition][x];
-						}
-						else
-						{
-							break;
-						}
-						// stop looking if the colors don't match
-						if (currentColor != matchingColor)
-						{
-							break;
-						}
-						else
-						{
-							++rowMatchCount;
-						}
-					}
-				}
-
-				// check if a sequence of at least 3 horizontal matching color has been found
-				if (colMatchCount >= NO_MATCHES)
-				{
-					matchItem item;
-					item.x = x;
-					item.y = y;
-					item.sequence = colMatchCount;
-					item.isX = true;
-					matches.push_back(item);
-				}
-				// check if a sequence of at least 3 vertical matching color has been found
-				if (rowMatchCount >= NO_MATCHES)
-				{
-					matchItem item;
-					item.x = x;
-					item.y = y;
-					item.sequence = rowMatchCount;
-					item.isX = false;
-					matches.push_back(item);
-				}
-			}
-		}
-		return matches;
-	}
-
 	void Update() {
 		mEngine.Render(King::Engine::TEXTURE_BACKGROUND, 0, 0);
 
@@ -170,8 +36,8 @@ public:
 			float clickX = mEngine.GetMouseX();
 			float clickY = mEngine.GetMouseY();
 
-			int row = (clickX - 340.0) / 40;
-			int col = (clickY - 120.0) / 40;
+			int row = (int) (clickX - 340.0) / 40;
+			int col = (int) (clickY - 120.0) / 40;
 
 			if (isValid(col) && isValid(row))
 			{
@@ -194,7 +60,7 @@ public:
 						secondClick = mDiamonds[secondCol][secondRow];
 						mDiamonds[secondCol][secondRow] = firstClick;
 						mDiamonds[firstCol][firstRow] = secondClick;
-						swapMatches(getMatchedDiamonds());
+						swapMatches(mDiamonds, getMatchedDiamonds(mDiamonds));
 					}
 					firstClick = 0;
 					firstRow = -1;
