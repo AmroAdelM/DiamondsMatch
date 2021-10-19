@@ -7,12 +7,12 @@ Board::Board(int aBoard_size, int aMatch, int aMax)
 	mDiamonds = std::vector<std::vector<int>>(mBoardSize, std::vector<int>(mBoardSize, 0));
 }
 
-int Board::getDiamond(int x, int y)
+int Board::getDiamond(const int& x, const int& y)
 {
 	return mDiamonds[x][y];
 }
 
-void Board::setDiamond(int x, int y, int value)
+void Board::setDiamond(const int& x, const int& y, const int& value)
 {
 	mDiamonds[x][y] = value;
 }
@@ -59,48 +59,73 @@ void Board::generateInitialDiamonds()
 	}
 };
 
-void Board::swapMatches(const std::vector<matchItem>& aItems)
+void Board::replaceMatches(const std::vector<matchItem>& aItems)
 {
-	std::random_device dev;
-	std::mt19937 rng(dev());
-	std::uniform_int_distribution<std::mt19937::result_type> randomGenerator(1, 5); //King::Engine::Texture
 	for (const auto& matchedItem : aItems)
 	{
 		for (int position = matchedItem.sequence; (position > 0) && isKeyValid(position + (matchedItem.isHorizontalMatch ? matchedItem.x : matchedItem.y)); position--)
 		{
-			auto sequence = matchedItem.sequence;
-			auto newDmnd = randomGenerator(rng);
 			if (matchedItem.isHorizontalMatch)
 			{
-				auto iterator = matchedItem.y;
-				while (iterator >= 0)
-				{
-					if (iterator > 0)
-					{
-						mDiamonds[iterator][matchedItem.x + position - 1] = mDiamonds[iterator - 1][matchedItem.x + position - 1];
-						iterator--;
-					}
-					else
-					{
-						mDiamonds[iterator][matchedItem.x + position - 1] = newDmnd;
-						iterator--;
-					}
-				}
+				replaceHorizontal(matchedItem, position);
 			}
 			else
 			{
-				auto iterator = matchedItem.y + position - sequence - 1;
-				if (iterator >= 0)
-				{
-					mDiamonds[matchedItem.y + position - 1][matchedItem.x] = mDiamonds[iterator][matchedItem.x];
-					mDiamonds[iterator--][matchedItem.x] = newDmnd;
-				}
-				else
-				{
-					mDiamonds[matchedItem.y + position - 1][matchedItem.x] = newDmnd;
-				}
+				replaceVertical(matchedItem, position);
 			}
 		}
+	}
+}
+
+void Board::replaceHorizontal(const matchItem& matchedItem, const int& position)
+{
+	std::random_device dev;
+	std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> randomGenerator(1, 5); //King::Engine::Texture
+	auto newDmnd = randomGenerator(rng);
+
+	auto iterator = matchedItem.y;
+	while (iterator >= 0)
+	{
+		if (iterator > 0)
+		{
+			mDiamonds[iterator][matchedItem.x + position - 1] = mDiamonds[iterator - 1][matchedItem.x + position - 1];
+			iterator--;
+		}
+		else
+		{
+			mDiamonds[iterator][matchedItem.x + position - 1] = newDmnd;
+			if (newDmnd == mDiamonds[iterator+1][matchedItem.x + position - 1]
+				&& newDmnd == mDiamonds[iterator+2][matchedItem.x + position - 1])
+			{
+				while (newDmnd == mDiamonds[iterator][matchedItem.x + position - 1])
+				{
+					newDmnd = randomGenerator(rng);
+				}
+			}
+			mDiamonds[iterator][matchedItem.x + position - 1] = newDmnd;
+			iterator--;
+		}
+	}
+}
+
+void Board::replaceVertical(const matchItem& matchedItem, const int& position)
+{
+	std::random_device dev;
+	std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> randomGenerator(1, 5); //King::Engine::Texture
+	auto newDmnd = randomGenerator(rng);
+
+	auto sequence = matchedItem.sequence;
+	auto iterator = matchedItem.y + position - sequence - 1;
+	if (iterator >= 0)
+	{
+		mDiamonds[matchedItem.y + position - 1][matchedItem.x] = mDiamonds[iterator][matchedItem.x];
+		mDiamonds[iterator--][matchedItem.x] = newDmnd;
+	}
+	else
+	{
+		mDiamonds[matchedItem.y + position - 1][matchedItem.x] = newDmnd;
 	}
 }
 
@@ -115,13 +140,13 @@ std::vector<matchItem> Board::getMatchedDiamonds()
 			int rowMatchCount = 1;
 
 			// look horizontally - there is no need to look up the last two columns
-			if (x <= (BOARD_SIZE - NO_MATCHES))
+			if (x < BOARD_SIZE)
 			{
 				colMatchCount = getHorizontalMatchCount(x, y);
 			}
 
 			// no need to look up the last two rows to look up the last two rows
-			if (y <= (BOARD_SIZE - NO_MATCHES - 1))
+			if (y < BOARD_SIZE)
 			{
 				rowMatchCount = getVerticalMatchCount(x, y);
 			}
@@ -133,7 +158,6 @@ std::vector<matchItem> Board::getMatchedDiamonds()
 				item.x = x;
 				item.y = y;
 				item.isHorizontalMatch = (colMatchCount >= NO_MATCHES);
-
 				item.sequence = item.isHorizontalMatch ? colMatchCount : rowMatchCount;
 				matches.push_back(item);
 			}
@@ -142,7 +166,74 @@ std::vector<matchItem> Board::getMatchedDiamonds()
 	return matches;
 }
 
-int Board::getHorizontalMatchCount(int x, int y)
+bool Board::hasMatch(const int& cellY, const int& cellX)
+{
+	int sourceColor = mDiamonds[cellY][cellX];
+
+	// look right
+	if (cellX < (BOARD_SIZE - 2))
+	{
+		if (sourceColor == mDiamonds[cellY][cellX + 1]
+			&& sourceColor == mDiamonds[cellY][cellX + 2])
+		{
+			return true;
+		}
+	}
+
+	// look left
+	if (cellX > 1)
+	{
+		if (sourceColor == mDiamonds[cellY][cellX - 1]
+			&& sourceColor == mDiamonds[cellY][cellX - 2])
+		{
+			return true;
+		}
+	}
+
+	// look left and right 1 field
+	if (cellX > 0 && cellX < (BOARD_SIZE - 1))
+	{
+		if (sourceColor == mDiamonds[cellY][cellX - 1]
+			&& sourceColor == mDiamonds[cellY][cellX + 1])
+		{
+			return true;
+		}
+	}
+
+	// look down
+	if (cellY < (BOARD_SIZE - 2))
+	{
+		if (sourceColor == mDiamonds[cellY + 1][cellX]
+			&& sourceColor == mDiamonds[cellY + 2][cellX])
+		{
+			return true;
+		}
+	}
+
+	// look up
+	if (cellY > 1)
+	{
+		if (sourceColor == mDiamonds[cellY - 1][cellX]
+			&& sourceColor == mDiamonds[cellY - 2][cellX])
+		{
+			return true;
+		}
+	}
+
+	// look up and down 1 field
+	if (cellY > 0 && cellY < (BOARD_SIZE - 1))
+	{
+		if (sourceColor == mDiamonds[cellY - 1][cellX]
+			&& sourceColor == mDiamonds[cellY + 1][cellX])
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int Board::getHorizontalMatchCount(const int& x, const int& y)
 {
 	int currentColor = mDiamonds[y][x];
 	int matchingColor = currentColor;
@@ -175,7 +266,7 @@ int Board::getHorizontalMatchCount(int x, int y)
 	return colMatchCount;
 }
 
-int Board::getVerticalMatchCount(int x, int y)
+int Board::getVerticalMatchCount(const int& x, const int& y)
 {
 	int currentColor = mDiamonds[y][x];
 	int matchingColor = currentColor;

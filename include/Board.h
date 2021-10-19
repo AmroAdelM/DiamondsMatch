@@ -14,12 +14,15 @@ class Board
 public:
 	Board(int aBoard_size, int aMatch, int aMax);
 	void generateInitialDiamonds();
-	void swapMatches(const std::vector<matchItem>& aItems);
-	void setDiamond(int x, int y, int value);
-	int getDiamond(int x, int y);
-	int getHorizontalMatchCount(int x, int y);
-	int getVerticalMatchCount(int x, int y);
+	void replaceMatches(const std::vector<matchItem>& aItems);
+	void replaceHorizontal(const matchItem& aItems, const int& position);
+	void replaceVertical(const matchItem& aItems, const int& position);
+	void setDiamond(const int& x, const int& y, const int& value);
+	int getDiamond(const int& x, const int& y);
+	int getHorizontalMatchCount(const int& x, const int& y);
+	int getVerticalMatchCount(const int& x, const int& y);
 	std::vector<matchItem> getMatchedDiamonds();
+	bool hasMatch(const int& cellX, const int& cellY);
 
 private:
 	std::vector<std::vector<int>> mDiamonds;

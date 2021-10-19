@@ -53,9 +53,20 @@ void BoardUpdater::handleMouseClick()
 			if ((abs(secondClickCol - firstClickCol) + abs(secondClickRow - firstClickRow)) == 1)
 			{
 				secondClickValue = mBoard.getDiamond(secondClickCol, secondClickRow);
+
 				mBoard.setDiamond(secondClickCol, secondClickRow, firstClickValue);
 				mBoard.setDiamond(firstClickCol, firstClickRow, secondClickValue);
-				mBoard.swapMatches(mBoard.getMatchedDiamonds());
+
+				// if no matches were caused by this swap revert it
+				if (!mBoard.hasMatch(secondClickCol, secondClickRow)
+					&& !mBoard.hasMatch(firstClickCol, firstClickRow))
+				{
+					mBoard.setDiamond(secondClickCol, secondClickRow, secondClickValue);
+					mBoard.setDiamond(firstClickCol, firstClickRow, firstClickValue);
+				}
+
+				//check for swaps and replace them
+				mBoard.replaceMatches(mBoard.getMatchedDiamonds());
 			}
 			firstClickValue = 0;
 			firstClickRow = -1;
