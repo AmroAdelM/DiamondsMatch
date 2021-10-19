@@ -152,12 +152,12 @@ std::vector<matchItem> Board::getMatchedDiamonds()
 			}
 
 			// check if a sequence of matching colors has been found
-			if (colMatchCount >= NO_MATCHES || rowMatchCount >= NO_MATCHES)
+			if (colMatchCount >= mNo_Matches || rowMatchCount >= mNo_Matches)
 			{
 				matchItem item;
 				item.x = x;
 				item.y = y;
-				item.isHorizontalMatch = (colMatchCount >= NO_MATCHES);
+				item.isHorizontalMatch = (colMatchCount >= mNo_Matches);
 				item.sequence = item.isHorizontalMatch ? colMatchCount : rowMatchCount;
 				matches.push_back(item);
 			}
@@ -239,7 +239,7 @@ int Board::getHorizontalMatchCount(const int& x, const int& y)
 	int matchingColor = currentColor;
 	int colMatchCount = 1;
 
-	while (colMatchCount > 0 && colMatchCount < MAX_MATCHES)
+	while (colMatchCount > 0 && colMatchCount < mMax_Matches)
 	{
 		int xPosition = x + colMatchCount;
 		if (isKeyValid(xPosition))
@@ -272,7 +272,7 @@ int Board::getVerticalMatchCount(const int& x, const int& y)
 	int matchingColor = currentColor;
 	int rowMatchCount = 1;
 
-	while (rowMatchCount > 0 && rowMatchCount < MAX_MATCHES)
+	while (rowMatchCount > 0 && rowMatchCount < mMax_Matches)
 	{
 		int yPosition = y + rowMatchCount;
 		if (isKeyValid(yPosition))
