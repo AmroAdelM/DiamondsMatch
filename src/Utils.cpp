@@ -1,51 +1,85 @@
 #include "Utils.h"
 
-bool isValid(int x)
+bool isKeyValid(int x)
 {
 	return (x >= 0 && x < BOARD_SIZE);
 }
 
-std::vector<std::vector<int>> generateInitialDiamonds()
-{
-	std::vector<std::vector<int>> mDiamonds(BOARD_SIZE, std::vector<int>(BOARD_SIZE));
+BoardUpdater::BoardUpdater()
+	: mEngine("./assets")
+	, mBoard(BOARD_SIZE, NO_MATCHES, MAX_MATCHES)
+	, firstClick(0)
+	, secondClick(0)
+	, firstCol(-1)
+	, firstRow(-1)
+	, secondCol(-1)
+	, secondRow(-1){}
 
-	std::random_device dev;
-	std::mt19937 rng(dev());
-	std::uniform_int_distribution<std::mt19937::result_type> randomGenerator(1, 5); // distribution in range [1, 5]
+void BoardUpdater::Update() {
+	mEngine.Render(King::Engine::TEXTURE_BACKGROUND, 0, 0);
 
-	for (auto row = 0; row < BOARD_SIZE; row++)
+	if (mEngine.GetMouseButtonDown())
 	{
-		for (auto col = 0; col < BOARD_SIZE; col++)
+		handleMouseClick();
+	}
+
+	renderDiamonds();
+}
+
+void BoardUpdater::handleMouseClick()
+{
+	float clickX = mEngine.GetMouseX();
+	float clickY = mEngine.GetMouseY();
+
+	int row = (int)(clickX - 340.0) / 40;
+	int col = (int)(clickY - 120.0) / 40;
+
+	if (isKeyValid(col) && isKeyValid(row))
+	{
+		if (firstClick == 0 && firstCol == -1 && firstRow == -1 && (row != secondRow || col != secondCol))
 		{
-			auto newDmnd = randomGenerator(rng);
-			mDiamonds[row][col] = newDmnd;
+			firstCol = col;
+			firstRow = row;
 
-			//check column matches before adding the new random diamond
-			if (col > 1)
+			firstClick = mBoard.getDiamond(firstCol, firstRow);
+			secondClick = 0;
+			secondCol = -1;
+			secondRow = -1;
+		}
+		else if (secondClick == 0 && secondCol == -1 && secondRow == -1 && (row != firstRow || col != firstCol))
+		{
+			secondCol = col;
+			secondRow = row;
+			if ((abs(secondCol - firstCol) + abs(secondRow - firstRow)) == 1)
 			{
-				if (newDmnd == mDiamonds[row][col - 1] && newDmnd == mDiamonds[row][col - 2])
-				{
-					while (newDmnd == mDiamonds[row][col])
-					{
-						newDmnd = randomGenerator(rng);
-					}
-				}
+				secondClick = mBoard.getDiamond(secondCol, secondRow);
+				mBoard.setDiamond(secondCol, secondRow, firstClick);
+				mBoard.setDiamond(firstCol, firstRow, secondClick);
+				mBoard.swapMatches(mBoard.getMatchedDiamonds());
 			}
-
-			//check row matches before adding the new random diamond
-			if (row > 1)
-			{
-				if (newDmnd == mDiamonds[row - 1][col] && newDmnd == mDiamonds[row - 2][col])
-				{
-					while (newDmnd == mDiamonds[row][col])
-					{
-						newDmnd = randomGenerator(rng);
-					}
-				}
-			}
-
-			mDiamonds[row][col] = newDmnd;
+			firstClick = 0;
+			firstRow = -1;
+			firstCol = -1;
 		}
 	}
-	return mDiamonds;
-};
+}
+
+void BoardUpdater::Start() {
+	mBoard.generateInitialDiamonds();
+	mEngine.Start(*this);
+}
+
+void BoardUpdater::renderDiamonds()
+{
+	for (auto col = 0; col < BOARD_SIZE; col++)
+	{
+		for (auto row = 0; row < BOARD_SIZE; row++)
+		{
+			auto diamond = mBoard.getDiamond(col, row);
+			if (diamond >= 1 && diamond <= 5) // in range [1, 5] for colors only in King::Engine::TEXTURE 
+			{
+				mEngine.Render((King::Engine::Texture)diamond, 340 + (40.0f * row), 120 + (40.0f * col));
+			}
+		}
+	}
+}

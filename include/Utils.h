@@ -1,20 +1,32 @@
 #pragma once
-
+#include <king/Engine.h>
+#include <king/Updater.h>
 #include <random>
 #include<vector>
+#include "Board.h"
 
 #define BOARD_SIZE 8
 #define NO_MATCHES 3
-#define MAX_MATCHES 5
+#define MAX_MATCHES (2 * NO_MATCHES) - 1  // max numbers of matches following a matching swap
 
-struct matchItem
-{
-	int x;
-	int y;
-	int sequence;
-	bool isX;
-}; 
+bool isKeyValid(int x);
 
-bool isValid(int x);
+class BoardUpdater : public King::Updater {
+public:
+	BoardUpdater();
+	void Start();
+	void handleMouseClick();
+	void Update();
+	void renderDiamonds();
 
-std::vector<std::vector<int>> generateInitialDiamonds();
+private:
+	King::Engine mEngine;
+	Board mBoard;
+
+	int firstCol;
+	int firstRow;
+	int secondCol;
+	int secondRow;
+	int firstClick;
+	int secondClick;
+};
